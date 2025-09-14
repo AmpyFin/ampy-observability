@@ -1,0 +1,62 @@
+{
+    "annotations": {"list":[{"builtIn":1,"datasource":{"type":"grafana","uid":"grafana"},"enable":true,"hide":true,"iconColor":"rgba(0, 211, 255, 1)","name":"Annotations & Alerts","type":"dashboard"}]},
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "iteration": 1,
+    "links": [],
+    "panels": [
+      {
+        "type": "stat",
+        "title": "Request Rate (req/s)",
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "Prometheus"},
+        "targets": [{"expr": "sum(irate(ampy_demo_requests_total[1m]))"}]
+      },
+      {
+        "type": "timeseries",
+        "title": "Request Rate over Time",
+        "gridPos": {"h": 8, "w": 16, "x": 8, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "Prometheus"},
+        "targets": [{"expr": "sum(irate(ampy_demo_requests_total[1m]))"}]
+      },
+      {
+        "type": "stat",
+        "title": "p95 Latency (ms)",
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 6},
+        "datasource": {"type": "prometheus", "uid": "Prometheus"},
+        "targets": [{
+          "expr": "histogram_quantile(0.95, sum(irate(ampy_demo_request_latency_ms_bucket[1m])) by (le))"
+        }]
+      },
+      {
+        "type": "timeseries",
+        "title": "Avg Latency (ms)",
+        "gridPos": {"h": 8, "w": 16, "x": 8, "y": 8},
+        "datasource": {"type": "prometheus", "uid": "Prometheus"},
+        "targets": [{
+          "expr": "sum(irate(ampy_demo_request_latency_ms_sum[1m])) / sum(irate(ampy_demo_request_latency_ms_count[1m]))"
+        }]
+      },
+      {
+        "type": "text",
+        "title": "Traces & Logs",
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 16},
+        "options": {
+          "content": "Use **Explore** → **Tempo** to search for `service.name=ampy-demo` and paste a TraceID if you have one. For logs, use **Explore** → **Loki** (e.g., `{job=\"otel-collector\"}`).",
+          "mode": "markdown"
+        }
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "style": "dark",
+    "tags": ["ampyfin","demo"],
+    "templating": {"list":[]},
+    "time": {"from": "now-15m", "to": "now"},
+    "timepicker": {},
+    "title": "Ampy Demo - Service Overview",
+    "version": 1,
+    "weekStart": ""
+  }
+  
