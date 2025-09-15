@@ -1,12 +1,13 @@
 apiVersion: 1
 
 providers:
-  - name: "ampy dashboards"
+  - name: 'Ampyfin'
     orgId: 1
-    folder: "Ampyfin"
+    folder: 'Ampyfin'
     type: file
-    disableDeletion: true
-    allowUiUpdates: false
-    updateIntervalSeconds: 30
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 10
     options:
-      path: /etc/grafana/provisioning/dashboards/json
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true

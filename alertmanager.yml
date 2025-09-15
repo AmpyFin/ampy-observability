@@ -1,0 +1,12 @@
+route:
+  receiver: "webhook-default"
+  group_by: ["alertname"]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 2h
+
+receivers:
+  - name: "webhook-default"
+    webhook_configs:
+      - url: "http://webhook-sink:8080/"
+        send_resolved: true

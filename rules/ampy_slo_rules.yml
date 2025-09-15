@@ -1,0 +1,51 @@
+groups:
+  - name: ampyfin-demo-slos
+    interval: 30s
+    rules:
+      # Always-on test to verify alerting path
+      - alert: DeadMansSwitch
+        expr: vector(1)
+        labels:
+          severity: info
+        annotations:
+          summary: "DeadMan's Switch (should always be firing)"
+          description: "Used to verify Alertmanager route & sinks."
+
+      # No metrics coming in from the demo app
+      - alert: AmpyDemoNoScrapes
+        expr: absent(ampy_demo_requests_total) or rate(ampy_demo_requests_total[2m]) == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ampy-demo: no traffic / no scrapes"
+          description: "Prometheus sees no request activity from the demo app for 2m."
+
+      # High p95 latency (ms) over 5 minutes
+      - alert: AmpyDemoHighLatencyP95
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (
+              rate(ampy_demo_request_latency_ms_bucket[5m])
+            )
+          ) > 200
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ampy-demo: high latency (p95 > 200ms)"
+          description: "p95 latency has been >200ms for 5m. Investigate traces in Tempo."
+
+      # Sudden drop or spike in request rate (optional guard)
+      - alert: AmpyDemoRequestRateAnomaly
+        expr: |
+          (rate(ampy_demo_requests_total[5m]) > 200)
+          or
+          (rate(ampy_demo_requests_total[5m]) < 0.1)
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ampy-demo: anomalous request rate"
+          description: "Sustained unusual request rate for 5m."

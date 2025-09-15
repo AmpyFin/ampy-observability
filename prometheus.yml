@@ -1,20 +1,24 @@
 global:
-  scrape_interval: 5s
-  evaluation_interval: 5s
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
+  # OpenTelemetry Collector's Prometheus exporter (our pipeline metrics)
   - job_name: otel-collector
     static_configs:
       - targets: ["otel-collector:8889"]
 
+  # Tempo's own metrics/health
   - job_name: tempo
     static_configs:
       - targets: ["tempo:3200"]
 
+  # Loki's own metrics/health
   - job_name: loki
     static_configs:
       - targets: ["loki:3100"]
 
+  # Your demo app (running on the host)
   - job_name: ampy-demo
     static_configs:
       - targets: ["host.docker.internal:9464"]

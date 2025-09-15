@@ -1,6 +1,6 @@
 extensions:
   health_check:
-    endpoint: "0.0.0.0:13133"
+    endpoint: "0.0.0.0:13133"  # GET /healthz
   pprof:
     endpoint: "0.0.0.0:1777"
   zpages:
@@ -22,19 +22,19 @@ processors:
     spike_limit_mib: 200
 
 exporters:
-  # Traces -> Tempo (gRPC, internal service DNS)
+  # Traces -> Tempo (gRPC)
   otlp/tempo:
     endpoint: tempo:4317
     tls:
       insecure: true
 
-  # Logs -> Loki via OTLP/HTTP (native ingest at /otlp)
+  # Logs -> Loki (native OTLP ingest at /otlp)
   otlphttp/loki:
     endpoint: http://loki:3100/otlp
     tls:
       insecure: true
 
-  # Metrics -> expose as /metrics for Prometheus to scrape
+  # Metrics -> expose as /metrics for Prometheus
   prometheus:
     endpoint: "0.0.0.0:8889"
 

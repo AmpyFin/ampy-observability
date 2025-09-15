@@ -1,0 +1,85 @@
+{
+    "uid": "ampyfin-demo",
+    "title": "Ampyfin Demo",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "10s",
+    "time": { "from": "now-15m", "to": "now" },
+    "panels": [
+      {
+        "type": "timeseries",
+        "title": "Request rate (req/s)",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "fieldConfig": { "defaults": {}, "overrides": [] },
+        "options": { "legend": { "showLegend": true }, "tooltip": { "mode": "single" }, "exemplars": true },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "expr": "sum(rate(ampy_demo_requests_total[1m]))",
+            "interval": "",
+            "legendFormat": "ampy_demo"
+          }
+        ]
+      },
+      {
+        "type": "timeseries",
+        "title": "p95 latency (ms)",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "fieldConfig": { "defaults": {}, "overrides": [] },
+        "options": { "legend": { "showLegend": true }, "tooltip": { "mode": "single" }, "exemplars": true },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "expr": "histogram_quantile(0.95, sum by (le) (rate(ampy_demo_request_latency_ms_bucket[5m])))",
+            "interval": "",
+            "legendFormat": "p95"
+          }
+        ]
+      },
+      {
+        "type": "stat",
+        "title": "Avg latency (5m)",
+        "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+        "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value" },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "expr": "sum(rate(ampy_demo_request_latency_ms_sum[5m])) / sum(rate(ampy_demo_request_latency_ms_count[5m]))",
+            "instant": true
+          }
+        ]
+      },
+      {
+        "type": "stat",
+        "title": "Requests in last 5m",
+        "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+        "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value" },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "expr": "sum(increase(ampy_demo_requests_total[5m]))",
+            "instant": true
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "title": "Prometheus scrape targets (health)",
+        "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+        "options": { "showHeader": true },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "expr": "up{job=~\"ampy-demo|tempo|loki|otel-collector\"}",
+            "instant": true
+          }
+        ]
+      }
+    ]
+  }
+  

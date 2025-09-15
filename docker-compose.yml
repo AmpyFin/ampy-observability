@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   grafana:
     image: grafana/grafana:latest
@@ -7,9 +9,12 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      # optional: preinstall tempo datasource plugin (Grafana works without this too)
+      # - GF_INSTALL_PLUGINS=grafana-tempo-datasource@1.0.0
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      # IMPORTANT: mount dashboards so the Ampyfin folder appears
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     restart: unless-stopped
@@ -55,7 +60,7 @@ services:
     container_name: tempo
     command: ["-config.file=/etc/tempo.yaml"]
     ports:
-      - "3200:3200"   # Tempo HTTP / metrics
+      - "3200:3200"   # Tempo HTTP / health / metrics
     volumes:
       - ./tempo.yaml:/etc/tempo.yaml:ro
       - tempo-data:/var/tempo
@@ -91,8 +96,9 @@ services:
     command: ["--config=/etc/otel-collector.yaml"]
     ports:
       - "4317:4317"   # OTLP gRPC (host apps send here)
-      - "4318:4318"   # OTLP HTTP (host apps send here)
-      - "8889:8889"   # Prometheus exporter /metrics
+      - "4318:4318"   # OTLP HTTP (optional)
+      - "8889:8889"   # Prometheus exporter /metrics (scraped by Prometheus)
+      - "13133:13133" # Collector healthz
     volumes:
       - ./otel-collector.yaml:/etc/otel-collector.yaml:ro
     restart: unless-stopped
@@ -102,6 +108,12 @@ services:
       loki:
         condition: service_healthy
     networks: [obsnet]
+    healthcheck:
+      # simple TCP check for /healthz port
+      test: ["CMD-SHELL", "nc -z localhost 13133 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   obsnet:
