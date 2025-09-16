@@ -1,0 +1,33 @@
+groups:
+- name: ampy-slos
+  interval: 1m
+  rules:
+  # OMS order latency p95 > 250ms for 5m
+  - alert: AmpyOMSHighLatencyP95
+    expr: histogram_quantile(0.95, sum by (le) (rate(ampy_oms_order_latency_ms_bucket[5m]))) > 250
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "OMS order latency p95 is high"
+      description: "p95 over 5m exceeds 250ms. Investigate broker or bus path latency."
+
+  # Bus delivery latency p99 > 150ms for 5m
+  - alert: AmpyBusHighLatencyP99
+    expr: histogram_quantile(0.99, sum by (le) (rate(ampy_bus_delivery_latency_ms_bucket[5m]))) > 150
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Bus delivery latency p99 is elevated"
+      description: "p99 over 5m exceeds 150ms on delivery path."
+
+  # OMS rejections spike (rate) over 5m
+  - alert: AmpyOMSRejectionsSpike
+    expr: sum by (reason) (rate(ampy_oms_rejections_total[5m])) > 0.2
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: "OMS rejections increasing"
+      description: "Rejection rate > 0.2/s for 5m. Top reasons in panel."

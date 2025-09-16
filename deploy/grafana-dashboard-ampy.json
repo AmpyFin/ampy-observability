@@ -1,0 +1,175 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "row",
+      "title": "Bus",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Bus Produced Rate by Topic (msg/s)",
+      "description": "sum by (topic) (rate(ampy_bus_produced_total[1m]))",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 1},
+      "datasource": "${DS_PROM}",
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "targets": [
+        {
+          "expr": "sum by (topic) (rate(ampy_bus_produced_total[1m]))",
+          "legendFormat": "{{topic}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Bus Delivery Latency p95 (ms)",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 1},
+      "datasource": "${DS_PROM}",
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(ampy_bus_delivery_latency_ms_bucket[5m])))",
+          "legendFormat": "p95",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Bus Delivery Latency p99 (ms)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 9},
+      "datasource": "${DS_PROM}",
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(ampy_bus_delivery_latency_ms_bucket[5m])))",
+          "legendFormat": "p99",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "OMS",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 17},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "OMS Submit Rate by Outcome (1m)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
+      "datasource": "${DS_PROM}",
+      "targets": [
+        {
+          "expr": "sum by (outcome) (rate(ampy_oms_order_submit_total[1m]))",
+          "legendFormat": "{{outcome}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "OMS Order Latency p95 (ms)",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 18},
+      "datasource": "${DS_PROM}",
+      "fieldConfig": {"defaults": {"unit": "ms"}, "overrides": []},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(ampy_oms_order_latency_ms_bucket[5m])))",
+          "legendFormat": "p95",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "OMS Rejections by Reason (5m)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 26},
+      "datasource": "${DS_PROM}",
+      "targets": [
+        {
+          "expr": "sum by (reason) (rate(ampy_oms_rejections_total[5m]))",
+          "legendFormat": "{{reason}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Logs",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 34},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "logs",
+      "title": "Recent Logs (Loki)",
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 35},
+      "datasource": "${DS_LOKI}",
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showLabels": false,
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{job=\"ampy\"}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["ampy", "observability", "domain"],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROM",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {"selected": true},
+        "hide": 0
+      },
+      {
+        "name": "DS_LOKI",
+        "type": "datasource",
+        "query": "loki",
+        "current": {"selected": true},
+        "hide": 0
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "",
+  "title": "Ampy — Domain Metrics & Logs",
+  "uid": null,
+  "version": 1,
+  "weekStart": ""
+}

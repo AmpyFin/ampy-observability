@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ampyobs"
+version = "0.0.1"
+description = "Ampy Observability SDK (Python) — logs, metrics, tracing"
+authors = [{ name = "AmpyFin" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "opentelemetry-api>=1.22.0",
+  "opentelemetry-sdk>=1.22.0",
+  "opentelemetry-exporter-otlp>=1.22.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ampyobs*"]
+
+[project.urls]
+Homepage = "https://github.com/AmpyFin/ampy-observability"

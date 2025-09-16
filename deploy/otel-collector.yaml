@@ -1,0 +1,83 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: {}   # 4317
+      http: {}   # 4318
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+  batch:
+    send_batch_size: 512
+    timeout: 2s
+
+  # Remove or hash sensitive attributes
+  attributes/redact:
+    actions:
+      # Delete obvious secrets (if apps ever set them on spans/logs by mistake)
+      - key: password
+        action: delete
+      - key: api_key
+        action: delete
+      - key: token
+        action: delete
+      - key: secret
+        action: delete
+      - key: broker_payload_redacted
+        action: delete
+      - key: broker_payload
+        action: delete
+      - key: secret_ref
+        action: delete
+      # Example: hash account_id if you ever put it on spans (prefer not to)
+      - key: account_id
+        action: hash
+
+  # Probabilistic sampling to control volume (10% baseline)
+  probabilistic_sampler:
+    sampling_percentage: 10
+
+exporters:
+  # Traces → Jaeger (OTLP gRPC)
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Debug exporter to see traces
+  debug:
+    verbosity: detailed
+
+  # Metrics → Prometheus (scraped from collector's /metrics)
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
+  # Logs → Loki (native OTLP/HTTP endpoint)
+  otlphttp/logs:
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+
+service:
+  telemetry:
+    logs:
+      level: debug
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/redact, probabilistic_sampler, batch]
+      exporters: [otlp/jaeger]
+
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/redact, batch]
+      exporters: [otlphttp/logs]
