@@ -30,12 +30,24 @@ A comprehensive observability solution providing logs, metrics, and distributed 
 - **GitHub Actions**: Automated testing and publishing
 
 ### Installation
-```bash
-# Go
-go get github.com/ampyfin/ampy-observability/go/ampyobs
 
-# Python
+#### Go SDK
+```bash
+go get github.com/ampyfin/ampy-observability/go/ampyobs
+```
+
+#### Python SDK
+```bash
+# Install from PyPI (recommended)
 pip install ampyobs
+
+# Or install from source
+git clone https://github.com/AmpyFin/ampy-observability.git
+cd ampy-observability/python
+pip install -e .
+
+# Or install with requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Quick Start
@@ -263,7 +275,16 @@ defer span.End()
 ### Installation
 
 ```bash
-pip install -e ./python
+# Install from PyPI (recommended)
+pip install ampyobs
+
+# Or install from source
+git clone https://github.com/AmpyFin/ampy-observability.git
+cd ampy-observability/python
+pip install -e .
+
+# Or install with requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Basic Setup
@@ -733,6 +754,7 @@ go test -race ./...
 
 # Python tests
 cd python
+pip install -r requirements.txt
 pytest
 
 # Integration tests
