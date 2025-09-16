@@ -19,7 +19,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22.x"
+          go-version: "1.25.x"
           cache: true
 
       - name: Go module tidy & verify
@@ -37,13 +37,13 @@ jobs:
           cd go
           # fail if any file needs formatting
           fmtout=$(gofmt -l .); if [ -n "$fmtout" ]; then echo "::error::gofmt changed files:"; echo "$fmtout"; exit 1; fi
-          go vet ./...
+          go vet github.com/AmpyFin/ampy-observability/go/ampyobs/... github.com/AmpyFin/ampy-observability/go/examples/...
 
       - name: Build & Test (race)
         run: |
           cd go
-          go build ./...
-          go test -race ./...
+          go build github.com/AmpyFin/ampy-observability/go/ampyobs/... github.com/AmpyFin/ampy-observability/go/examples/...
+          go test -race github.com/AmpyFin/ampy-observability/go/ampyobs/... github.com/AmpyFin/ampy-observability/go/examples/...
 
   python-ci:
     name: Python — build & test
