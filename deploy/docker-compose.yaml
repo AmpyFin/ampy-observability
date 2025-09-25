@@ -1,6 +1,8 @@
+version: "3.9"
+
 services:
   otel-collector:
-    image: ghcr.io/open-telemetry/opentelemetry-collector:0.102.1
+    image: docker.io/otel/opentelemetry-collector:0.102.1
     command: ["--config=/etc/otelcol/config.yaml"]
     volumes:
       - ./otel-collector.yaml:/etc/otelcol/config.yaml:ro
@@ -13,7 +15,7 @@ services:
       - loki
 
   jaeger:
-    image: ghcr.io/jaegertracing/all-in-one:1.57
+    image: docker.io/jaegertracing/all-in-one:1.57
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     ports:
@@ -22,13 +24,13 @@ services:
     # no volumes needed
 
   loki:
-    image: ghcr.io/grafana/loki:2.9.8
+    image: docker.io/grafana/loki:2.9.8
     command: ["-config.file=/etc/loki/local-config.yaml"]
     ports:
       - "3100:3100"
 
   prometheus:
-    image: ghcr.io/prometheus/prometheus:v2.54.1
+    image: docker.io/prom/prometheus:v2.54.1
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/ampy.rules.yml:/etc/prometheus/ampy.rules.yml:ro
@@ -38,7 +40,7 @@ services:
       - "9090:9090"
 
   grafana:
-    image: ghcr.io/grafana/grafana:11.2.0
+    image: docker.io/grafana/grafana:11.2.0
     volumes:
       - ./grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
     environment:
@@ -51,7 +53,7 @@ services:
       - loki
 
   promtail:
-    image: ghcr.io/grafana/promtail:2.9.8
+    image: docker.io/grafana/promtail:2.9.8
     command: ["-config.file=/etc/promtail/promtail.yaml"]
     volumes:
       - ./promtail-config.yaml:/etc/promtail/promtail.yaml:ro
